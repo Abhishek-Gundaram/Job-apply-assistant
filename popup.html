@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>JobApply Assist</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <h1>JobApply Assist</h1>
+
+    <section class="card">
+      <div class="row">
+        <label>First name</label>
+        <input id="firstName" placeholder="Abhishek" />
+      </div>
+      <div class="row">
+        <label>Last name</label>
+        <input id="lastName" placeholder="Gundaram" />
+      </div>
+      <div class="row">
+        <label>Email</label>
+        <input id="email" placeholder="you@email.com" />
+      </div>
+      <div class="row">
+        <label>Phone</label>
+        <input id="phone" placeholder="+1 555 123 4567" />
+      </div>
+      <div class="row">
+        <label>LinkedIn</label>
+        <input id="linkedin" placeholder="https://linkedin.com/in/..." />
+      </div>
+
+      <div class="actions">
+        <button id="save">Save</button>
+        <button id="fill">Fill Basics</button>
+      </div>
+
+      <div id="status" class="status"></div>
+    </section>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
