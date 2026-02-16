@@ -15,6 +15,10 @@
         "default": "Alt+1"
       },
       "description": "Fill basic contact fields"
+    },
+    "fill-links": {
+    "suggested_key": { "default": "Alt+2" },
+    "description": "Fill links (LinkedIn, GitHub, Portfolio)"
     }
   },
   "background": {

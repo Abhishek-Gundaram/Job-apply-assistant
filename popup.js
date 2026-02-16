@@ -1,8 +1,27 @@
-const ids = ["firstName", "lastName", "email", "phone", "linkedin"];
+const ids = [
+  "fullName",
+  "firstName",
+  "lastName",
+  "email",
+  "phone",
+  "linkedin",
+  "github",
+  "portfolio",
+  "address1",
+  "city",
+  "state",
+  "zip",
+  "country",
+  "workAuth",
+  "sponsorship"
+];
 
 function getFormData() {
   const data = {};
-  for (const id of ids) data[id] = document.getElementById(id).value.trim();
+  for (const id of ids) {
+    const el = document.getElementById(id);
+    data[id] = el ? el.value.trim() : "";
+  }
   return data;
 }
 
@@ -16,7 +35,8 @@ async function loadProfile() {
   const { profile } = await chrome.storage.local.get("profile");
   const p = profile || {};
   for (const id of ids) {
-    document.getElementById(id).value = p[id] || "";
+    const el = document.getElementById(id);
+    if (el) el.value = p[id] || "";
   }
 }
 
@@ -32,7 +52,7 @@ async function fillBasics() {
 
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab?.id) {
-    setStatus("No actions fields fouhd", true);
+    setStatus("No actions fields found", true);
     return;
   }
 

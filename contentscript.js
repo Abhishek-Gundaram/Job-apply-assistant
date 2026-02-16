@@ -1,4 +1,55 @@
 // ---- Helpers to work with React/controlled inputs ----
+function findYesNoControl(keywords) {
+  const candidates = Array.from(document.querySelectorAll("select, input[type=radio]"));
+  let best = null;
+  let bestScore = 0;
+
+  for (const el of candidates) {
+    const label = normalize(getLabelTextForInput(el));
+    const name = normalize(el.getAttribute("name") || "");
+    const id = normalize(el.id || "");
+
+    const hay = `${label} ${name} ${id}`;
+
+    let score = 0;
+    for (const kw of keywords) {
+      if (hay.includes(kw)) score += 10;
+    }
+
+    if (score > bestScore) {
+      bestScore = score;
+      best = el;
+    }
+  }
+
+  return bestScore >= 10 ? best : null;
+}
+
+function setSelectValue(selectEl, desired) {
+  const options = Array.from(selectEl.options || []);
+  const normDesired = normalize(desired);
+
+  const match = options.find(o => normalize(o.textContent).includes(normDesired));
+  if (!match) return false;
+
+  selectEl.focus();
+  selectEl.value = match.value;
+  selectEl.dispatchEvent(new Event("change", { bubbles: true }));
+  return true;
+}
+
+function setYesNoRadioGroup(groupName, yes) {
+  const radios = document.querySelectorAll(`input[type="radio"][name="${groupName}"]`);
+  for (const r of radios) {
+    const label = normalize(getLabelTextForInput(r));
+    if ((yes && label.includes("yes")) || (!yes && label.includes("no"))) {
+      r.click();
+      return true;
+    }
+  }
+  return false;
+}
+
 function setNativeValue(element, value) {
   const { set: valueSetter } =
     Object.getOwnPropertyDescriptor(element, "value") || {};
@@ -105,7 +156,12 @@ function fillBasics(profile) {
     { value: profile.lastName, keywords: ["last name", "surname", "family name", "lastname"] },
     { value: profile.email, keywords: ["email", "email address"] },
     { value: profile.phone, keywords: ["phone", "mobile", "telephone", "tel"] },
-    { value: profile.linkedin, keywords: ["linkedin", "linkedin profile"] }
+    { value: profile.linkedin, keywords: ["linkedin", "linkedin profile"] },
+    { value: profile.address1, keywords: ["address line 1", "street address", "address", "street"] },
+    { value: profile.city, keywords: ["city", "town"] },
+    { value: profile.state, keywords: ["state", "province", "region"] },
+    { value: profile.zip, keywords: ["zip", "zip code", "postal", "postal code"] },
+    { value: profile.country, keywords: ["country"] }
   ];
 
   let filledCount = 0;
@@ -120,9 +176,40 @@ function fillBasics(profile) {
     setNativeValue(input, m.value);
     filledCount++;
   }
+  if (profile.workAuth) {
+    const el = findYesNoControl([
+      "authorized",
+      "work authorization",
+      "legally authorized",
+      "eligible to work"
+    ]);
+    if (el) {
+      if (el.tagName === "SELECT") {
+        setSelectValue(el, profile.workAuth);
+      } else if (el.type === "radio" && el.name) {
+        setYesNoRadioGroup(el.name, profile.workAuth === "yes");
+      }
+    }
+  }
 
+  // Sponsorship
+  if (profile.sponsorship) {
+    const el = findYesNoControl([
+      "sponsorship",
+      "visa sponsorship",
+      "require sponsorship"
+    ]);
+    if (el) {
+      if (el.tagName === "SELECT") {
+        setSelectValue(el, profile.sponsorship);
+      } else if (el.type === "radio" && el.name) {
+        setYesNoRadioGroup(el.name, profile.sponsorship === "yes");
+      }
+    }
+  }
   return filledCount;
 }
+
 
 chrome.runtime.onMessage.addListener((msg, _sender, _sendResponse) => {
   if (msg?.type === "FILL_BASICS") {

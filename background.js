@@ -15,4 +15,4 @@ chrome.commands.onCommand.addListener(async (command) => {
       payload: profile
     });
   }
-});
+}); 
